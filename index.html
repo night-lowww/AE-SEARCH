@@ -1,0 +1,4091 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>AE SEARCH</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background: #0b0b10;
+
+            color: white;
+
+            text-align: center;
+
+            padding-top: 120px;
+
+        }
+
+
+        h1 {
+
+            font-size: 64px;
+
+            letter-spacing: 4px;
+
+            margin: 0;
+
+        }
+
+
+        .subtitle {
+
+            color: #999;
+
+            margin: 15px 0 40px;
+
+            font-size: 16px;
+
+        }
+
+
+        /* =========================
+           検索
+        ========================= */
+
+        .search-area {
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        input {
+
+            width: 550px;
+
+            padding: 18px 20px;
+
+            font-size: 17px;
+
+            border-radius: 12px;
+
+            border: 1px solid #333;
+
+            background: #18181f;
+
+            color: white;
+
+            outline: none;
+
+        }
+
+
+        input:focus {
+
+            border-color: #888;
+
+        }
+
+
+        button {
+
+            padding: 18px 28px;
+
+            font-size: 17px;
+
+            border-radius: 12px;
+
+            border: none;
+
+            background: white;
+
+            color: black;
+
+            cursor: pointer;
+
+        }
+
+
+        button:hover {
+
+            transform: translateY(-2px);
+
+        }
+
+
+        /* =========================
+           フィルター
+        ========================= */
+
+        .filter-area {
+
+            width: 700px;
+
+            margin: 25px auto 0;
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            justify-content: center;
+
+            gap: 8px;
+
+        }
+
+
+        .filter-button {
+
+            padding: 8px 14px;
+
+            border: 1px solid #444;
+
+            border-radius: 20px;
+
+            background: #18181f;
+
+            color: #aaa;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+        }
+
+
+        .filter-button:hover,
+        .filter-button.active {
+
+            background: white;
+
+            color: #111;
+
+        }
+
+
+        /* =========================
+           種類フィルター
+        ========================= */
+
+        .type-filter-area {
+
+            margin-top: 15px;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .type-filter-button {
+
+            padding: 8px 16px;
+
+            border: 1px solid #444;
+
+            border-radius: 20px;
+
+            background: #18181f;
+
+            color: #aaa;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+        }
+
+
+        .type-filter-button:hover,
+        .type-filter-button.active {
+
+            background: white;
+
+            color: #111;
+
+        }
+
+
+        /* =========================
+           検索結果
+        ========================= */
+
+        #results {
+
+            width: 700px;
+
+            margin: 50px auto;
+
+            text-align: left;
+
+        }
+
+
+        .result-card {
+
+            background: #17171e;
+
+            border: 1px solid #2b2b35;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            margin-bottom: 15px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+        }
+
+
+        .result-card:hover {
+
+            background: #20202a;
+
+            transform: translateY(-2px);
+
+        }
+
+
+        .result-card h2 {
+
+            margin-top: 0;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .result-type {
+
+            color: #888;
+
+            font-size: 14px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .result-description {
+
+            color: #aaa;
+
+            line-height: 1.6;
+
+        }
+
+
+        .result-code {
+
+            background: #0b0b0b;
+
+            color: #8be9fd;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            overflow-x: auto;
+
+            white-space: pre-wrap;
+
+            font-family: monospace;
+
+            margin-top: 15px;
+
+        }
+
+
+        .tags {
+
+            margin-top: 12px;
+
+        }
+
+
+        .tag {
+
+            display: inline-block;
+
+            background: #292934;
+
+            color: #ccc;
+
+            padding: 5px 10px;
+
+            margin: 3px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+        }
+
+
+        .no-result {
+
+            text-align: center;
+
+            color: #777;
+
+            padding: 30px;
+
+        }
+
+
+        /* =========================
+           お気に入り
+        ========================= */
+
+        .favorite-button {
+
+            margin-top: 10px;
+
+            padding: 8px 14px;
+
+            border: 1px solid #444;
+
+            border-radius: 8px;
+
+            background: #222;
+
+            color: white;
+
+            cursor: pointer;
+
+        }
+
+
+        .favorite-button:hover {
+
+            background: #333;
+
+        }
+
+
+        .favorite-panel {
+
+            display: none;
+
+            position: fixed;
+
+            top: 100px;
+
+            right: 30px;
+
+            width: 350px;
+
+            max-height: 70vh;
+
+            overflow-y: auto;
+
+            background: #17171e;
+
+            border: 1px solid #444;
+
+            border-radius: 15px;
+
+            padding: 20px;
+
+            z-index: 9999;
+
+            text-align: left;
+
+        }
+
+
+        .favorite-panel.show {
+
+            display: block;
+
+        }
+
+
+        .favorite-item {
+
+            padding: 12px;
+
+            margin-bottom: 8px;
+
+            background: #22222b;
+
+            border-radius: 8px;
+
+        }
+
+
+        .favorite-item strong {
+
+            display: block;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .favorite-item p {
+
+            color: #aaa;
+
+            line-height: 1.5;
+
+        }
+
+
+        .favorite-item button {
+
+            padding: 8px 12px;
+
+            font-size: 13px;
+
+            margin-right: 6px;
+
+        }
+
+
+        /* =========================
+           最近使った
+        ========================= */
+
+        #recentSection {
+
+            width: 700px;
+
+            margin: 30px auto;
+
+            text-align: left;
+
+        }
+
+
+        #recentSection h2 {
+
+            font-size: 20px;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .recent-item {
+
+            background: #17171e;
+
+            border: 1px solid #2b2b35;
+
+            border-radius: 10px;
+
+            padding: 14px 18px;
+
+            margin-bottom: 8px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+        }
+
+
+        .recent-item:hover {
+
+            background: #24242d;
+
+            transform: translateX(3px);
+
+        }
+
+
+        .recent-item strong {
+
+            display: block;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .recent-item span {
+
+            color: #888;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =========================
+           モーダル
+        ========================= */
+
+        .effect-modal {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(0, 0, 0, 0.75);
+
+            backdrop-filter: blur(6px);
+
+            z-index: 10000;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+
+        }
+
+
+        .effect-modal.show {
+
+            display: flex;
+
+        }
+
+
+        .effect-modal-content {
+
+            position: relative;
+
+            width: min(650px, 100%);
+
+            max-height: 85vh;
+
+            overflow-y: auto;
+
+            background: #151515;
+
+            color: white;
+
+            border: 1px solid #444;
+
+            border-radius: 16px;
+
+            padding: 30px;
+
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+            text-align: left;
+
+        }
+
+
+        .close-modal {
+
+            position: absolute;
+
+            top: 15px;
+
+            right: 18px;
+
+            background: none;
+
+            border: none;
+
+            color: #aaa;
+
+            font-size: 28px;
+
+            cursor: pointer;
+
+            padding: 5px 10px;
+
+        }
+
+
+        .close-modal:hover {
+
+            color: white;
+
+        }
+
+
+        #modalTitle {
+
+            margin: 0 40px 10px 0;
+
+            font-size: 28px;
+
+        }
+
+
+        .modal-type {
+
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            margin-bottom: 20px;
+
+            border-radius: 6px;
+
+            background: #333;
+
+            color: #aaa;
+
+            font-size: 13px;
+
+        }
+
+
+        #modalDescription {
+
+            line-height: 1.8;
+
+            color: #ccc;
+
+        }
+
+
+        .effect-modal-content h3 {
+
+            margin-top: 25px;
+
+            font-size: 14px;
+
+            color: #aaa;
+
+            letter-spacing: 1px;
+
+        }
+
+
+        #modalPurposes {
+
+            color: #ddd;
+
+            line-height: 1.7;
+
+        }
+
+
+        .code-box {
+
+            position: relative;
+
+            background: #0b0b0b;
+
+            border: 1px solid #333;
+
+            border-radius: 10px;
+
+            padding: 18px;
+
+            padding-right: 90px;
+
+            overflow-x: auto;
+
+        }
+
+
+        #modalCode {
+
+            color: #8be9fd;
+
+            font-family: monospace;
+
+            white-space: pre-wrap;
+
+        }
+
+
+        #copyCode {
+
+            position: absolute;
+
+            top: 10px;
+
+            right: 10px;
+
+            border: 1px solid #444;
+
+            border-radius: 6px;
+
+            background: #222;
+
+            color: white;
+
+            padding: 6px 10px;
+
+        }
+
+
+        /* =========================
+           AE TIME CALCULATOR
+        ========================= */
+
+        .time-calculator {
+
+            width: 700px;
+
+            margin: 60px auto 40px;
+
+            padding: 25px;
+
+            background: #17171e;
+
+            border: 1px solid #2b2b35;
+
+            border-radius: 14px;
+
+            text-align: left;
+
+        }
+
+
+        .time-calculator h2 {
+
+            margin: 0 0 8px;
+
+        }
+
+
+        .time-calculator-subtitle {
+
+            color: #888;
+
+            font-size: 13px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .time-input-group {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
+
+        }
+
+
+        .time-input-box label {
+
+            display: block;
+
+            color: #aaa;
+
+            font-size: 13px;
+
+            margin-bottom: 7px;
+
+        }
+
+
+        .time-input-box input {
+
+            width: 100%;
+
+            padding: 12px;
+
+            font-size: 15px;
+
+            border-radius: 8px;
+
+            border: 1px solid #333;
+
+            background: #0f0f14;
+
+            color: white;
+
+        }
+
+
+        .time-calculator-buttons {
+
+            display: flex;
+
+            gap: 10px;
+
+            margin-top: 20px;
+
+        }
+
+
+        .time-calculator-buttons button {
+
+            padding: 12px 20px;
+
+            font-size: 14px;
+
+        }
+
+
+        .time-result {
+
+            margin-top: 25px;
+
+            padding: 18px;
+
+            background: #0f0f14;
+
+            border: 1px solid #333;
+
+            border-radius: 10px;
+
+        }
+
+
+        .time-result-title {
+
+            color: #888;
+
+            font-size: 12px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .time-result-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            padding: 8px 0;
+
+            border-bottom: 1px solid #24242c;
+
+        }
+
+
+        .time-result-row:last-child {
+
+            border-bottom: none;
+
+        }
+
+
+        .time-result-row span:first-child {
+
+            color: #999;
+
+        }
+
+
+        .time-result-row span:last-child {
+
+            color: white;
+
+            font-family: monospace;
+
+            font-weight: bold;
+
+        }
+
+
+        /* =========================
+           HOME
+        ========================= */
+
+        .home-button {
+
+            position: fixed;
+
+            top: 25px;
+
+            left: 25px;
+
+            z-index: 10001;
+
+            padding: 10px 16px;
+
+            background: #18181f;
+
+            color: white;
+
+            border: 1px solid #444;
+
+            border-radius: 10px;
+
+            font-size: 14px;
+
+            cursor: pointer;
+
+        }
+
+
+        .home-button:hover {
+
+            background: white;
+
+            color: black;
+
+        }
+
+
+        /* =========================
+           スマホ
+        ========================= */
+
+        @media (max-width: 750px) {
+
+            body {
+
+                padding: 60px 15px;
+
+            }
+
+
+            h1 {
+
+                font-size: 42px;
+
+            }
+
+
+            input {
+
+                width: 100%;
+
+            }
+
+
+            .filter-area,
+            #results,
+            #recentSection,
+            .time-calculator {
+
+                width: 100%;
+
+            }
+
+
+            .time-input-group {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .favorite-panel {
+
+                left: 15px;
+
+                right: 15px;
+
+                width: auto;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HOME
+    ========================= -->
+
+    <button
+        id="homeButton"
+        class="home-button"
+        type="button"
+    >
+        ⌂ ホーム
+    </button>
+
+
+    <!-- =========================
+         タイトル
+    ========================= -->
+
+    <h1>
+        AE SEARCH
+    </h1>
+
+
+    <p class="subtitle">
+        After Effects 検索エンジン
+    </p>
+
+
+    <!-- =========================
+         検索
+    ========================= -->
+
+    <div class="search-area">
+
+        <input
+            id="searchBox"
+            type="text"
+            placeholder="エフェクトや演出を検索"
+        >
+
+        <button
+            id="searchButton"
+            type="button"
+        >
+            検索
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         種類フィルター
+    ========================= -->
+
+    <div
+        class="filter-area type-filter-area"
+    >
+
+        <button
+            class="type-filter-button active"
+            data-kind="all"
+            type="button"
+        >
+            すべて
+        </button>
+
+
+        <button
+            class="type-filter-button"
+            data-kind="effect"
+            type="button"
+        >
+            エフェクト
+        </button>
+
+
+        <button
+            class="type-filter-button"
+            data-kind="code"
+            type="button"
+        >
+            コード
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         ジャンルフィルター
+    ========================= -->
+
+    <div
+        class="filter-area"
+        id="filterArea"
+    >
+
+        <button
+            class="filter-button active"
+            data-filter="all"
+            type="button"
+        >
+            すべて
+        </button>
+
+
+        <button
+            class="filter-button"
+            data-filter="光"
+            type="button"
+        >
+            光
+        </button>
+
+
+        <button
+            class="filter-button"
+            data-filter="色"
+            type="button"
+        >
+            色
+        </button>
+
+
+        <button
+            class="filter-button"
+            data-filter="歪み"
+            type="button"
+        >
+            歪み
+        </button>
+
+
+        <button
+            class="filter-button"
+            data-filter="文字"
+            type="button"
+        >
+            文字
+        </button>
+
+
+        <button
+            class="filter-button"
+            data-filter="ノイズ"
+            type="button"
+        >
+            ノイズ
+        </button>
+
+
+        <button
+            class="filter-button"
+            data-filter="3D"
+            type="button"
+        >
+            3D
+        </button>
+
+
+        <button
+            class="filter-button"
+            data-filter="ホラー"
+            type="button"
+        >
+            ホラー
+        </button>
+
+
+        <button
+            class="filter-button"
+            data-filter="音"
+            type="button"
+        >
+            音
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         検索結果
+    ========================= -->
+
+    <div id="results"></div>
+
+
+    <!-- =========================
+         最近使った
+    ========================= -->
+
+    <div id="recentSection">
+
+        <h2>
+            最近使った
+        </h2>
+
+
+        <div id="recentList">
+
+            <p>
+                まだありません
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         お気に入り
+    ========================= -->
+
+    <button
+        id="favoriteButton"
+        type="button"
+    >
+        ⭐ お気に入り
+    </button>
+
+
+    <div
+        id="favoritePanel"
+        class="favorite-panel"
+    >
+
+        <h2>
+            ⭐ お気に入り
+        </h2>
+
+
+        <div id="favoriteList">
+
+            <p>
+                お気に入りはありません
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         AE TIME CALCULATOR
+    ========================= -->
+
+    <div class="time-calculator">
+
+        <h2>
+            AE TIME CALCULATOR
+        </h2>
+
+
+        <p class="time-calculator-subtitle">
+            フレーム・秒・タイムコードを相互変換
+        </p>
+
+
+        <div class="time-input-group">
+
+
+            <div class="time-input-box">
+
+                <label for="timeFps">
+                    FPS
+                </label>
+
+                <input
+                    id="timeFps"
+                    type="number"
+                    value="30"
+                    min="1"
+                    step="1"
+                >
+
+            </div>
+
+
+            <div class="time-input-box">
+
+                <label for="timeFrames">
+                    フレーム
+                </label>
+
+                <input
+                    id="timeFrames"
+                    type="number"
+                    placeholder="例：120"
+                    min="0"
+                    step="1"
+                >
+
+            </div>
+
+
+            <div class="time-input-box">
+
+                <label for="timeSeconds">
+                    秒
+                </label>
+
+                <input
+                    id="timeSeconds"
+                    type="number"
+                    placeholder="例：4"
+                    min="0"
+                    step="0.001"
+                >
+
+            </div>
+
+
+            <div class="time-input-box">
+
+                <label for="timecodeInput">
+                    タイムコード
+                </label>
+
+                <input
+                    id="timecodeInput"
+                    type="text"
+                    placeholder="00:00:04:00"
+                >
+
+            </div>
+
+
+        </div>
+
+
+        <div class="time-calculator-buttons">
+
+            <button
+                id="timeCalculateButton"
+                type="button"
+            >
+                変換
+            </button>
+
+
+            <button
+                id="timeClearButton"
+                type="button"
+            >
+                クリア
+            </button>
+
+        </div>
+
+
+        <div class="time-result">
+
+            <div class="time-result-title">
+                CONVERSION RESULT
+            </div>
+
+
+            <div class="time-result-row">
+
+                <span>
+                    フレーム
+                </span>
+
+                <span id="resultFrames">
+                    ---
+                </span>
+
+            </div>
+
+
+            <div class="time-result-row">
+
+                <span>
+                    秒
+                </span>
+
+                <span id="resultSeconds">
+                    ---
+                </span>
+
+            </div>
+
+
+            <div class="time-result-row">
+
+                <span>
+                    タイムコード
+                </span>
+
+                <span id="resultTimecode">
+                    ---
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         詳細モーダル
+    ========================= -->
+
+    <div
+        id="effectModal"
+        class="effect-modal"
+    >
+
+        <div class="effect-modal-content">
+
+
+            <button
+                id="closeModal"
+                class="close-modal"
+                type="button"
+            >
+                ×
+            </button>
+
+
+            <h2 id="modalTitle"></h2>
+
+
+            <span
+                id="modalType"
+                class="modal-type"
+            ></span>
+
+
+            <p id="modalDescription"></p>
+
+
+            <h3>
+                用途
+            </h3>
+
+
+            <p id="modalPurposes"></p>
+
+
+            <div id="codeArea">
+
+                <h3>
+                    AE EXPRESSION
+                </h3>
+
+
+                <div class="code-box">
+
+                    <code id="modalCode"></code>
+
+
+                    <button
+                        id="copyCode"
+                        type="button"
+                    >
+                        COPY
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         data.js
+    ========================= -->
+
+    <script src="data.js"></script>
+
+
+    <!-- =========================
+         メインJavaScript
+    ========================= -->
+
+    <script>
+
+
+        /* =========================
+           HTML取得
+        ========================= */
+
+        const searchBox =
+            document.getElementById("searchBox");
+
+
+        const searchButton =
+            document.getElementById("searchButton");
+
+
+        const results =
+            document.getElementById("results");
+
+
+        const favoriteButton =
+            document.getElementById("favoriteButton");
+
+
+        const favoritePanel =
+            document.getElementById("favoritePanel");
+
+
+        const homeButton =
+            document.getElementById("homeButton");
+
+
+        /* =========================
+           現在のフィルター
+        ========================= */
+
+        let currentKind = "all";
+
+
+        let currentGenre = "all";
+
+
+        /* =========================
+           保存データ
+        ========================= */
+
+        let favorites =
+            JSON.parse(
+                localStorage.getItem("aeFavorites")
+            ) || [];
+
+
+        let recentEffects =
+            JSON.parse(
+                localStorage.getItem("aeRecentEffects")
+            ) || [];
+
+
+        /* =========================
+           類義語
+        ========================= */
+
+        const synonyms = {
+
+            "光": [
+                "光",
+                "発光",
+                "グロー",
+                "ネオン",
+                "輝き",
+                "ライト",
+                "明るい"
+            ],
+
+            "光る": [
+                "光",
+                "発光",
+                "グロー",
+                "ネオン",
+                "輝き",
+                "ライト"
+            ],
+
+            "光らせる": [
+                "光",
+                "発光",
+                "グロー",
+                "ネオン",
+                "輝き",
+                "ライト"
+            ],
+
+            "発光": [
+                "光",
+                "発光",
+                "グロー",
+                "ネオン",
+                "輝き",
+                "ライト"
+            ],
+
+            "煙": [
+                "煙",
+                "スモーク",
+                "霧",
+                "モヤ",
+                "蒸気"
+            ],
+
+            "スモーク": [
+                "煙",
+                "スモーク",
+                "霧",
+                "モヤ",
+                "蒸気"
+            ],
+
+            "霧": [
+                "煙",
+                "スモーク",
+                "霧",
+                "モヤ",
+                "蒸気"
+            ],
+
+            "揺らす": [
+                "揺れ",
+                "振動",
+                "ブレ",
+                "ウィグル",
+                "波",
+                "歪み"
+            ],
+
+            "揺れる": [
+                "揺れ",
+                "振動",
+                "ブレ",
+                "ウィグル",
+                "波",
+                "歪み"
+            ],
+
+            "画面揺れ": [
+                "揺れ",
+                "振動",
+                "ブレ",
+                "ウィグル",
+                "波",
+                "歪み"
+            ],
+
+            "ぼかす": [
+                "ぼかし",
+                "ブラー",
+                "残像",
+                "ソフト"
+            ],
+
+            "ぼかし": [
+                "ぼかし",
+                "ブラー",
+                "残像",
+                "ソフト"
+            ],
+
+            "歪ませる": [
+                "歪み",
+                "変形",
+                "ディストーション",
+                "ワープ",
+                "波"
+            ],
+
+            "歪み": [
+                "歪み",
+                "変形",
+                "ディストーション",
+                "ワープ",
+                "波"
+            ],
+
+            "グニャグニャ": [
+                "歪み",
+                "変形",
+                "ワープ",
+                "波"
+            ],
+
+            "色を変える": [
+                "色",
+                "カラー",
+                "着色",
+                "色調",
+                "色相",
+                "彩度"
+            ],
+
+            "色変更": [
+                "色",
+                "カラー",
+                "着色",
+                "色調",
+                "色相",
+                "彩度"
+            ],
+
+            "色": [
+                "色",
+                "カラー",
+                "着色",
+                "色調",
+                "色相",
+                "彩度"
+            ],
+
+            "ノイズ": [
+                "ノイズ",
+                "粒子",
+                "グレイン",
+                "ざらつき",
+                "テクスチャ"
+            ],
+
+            "ざらざら": [
+                "ノイズ",
+                "粒子",
+                "グレイン",
+                "ざらつき"
+            ],
+
+            "グリッチ": [
+                "グリッチ",
+                "故障",
+                "ノイズ",
+                "歪み",
+                "VHS",
+                "テレビ"
+            ],
+
+            "故障": [
+                "グリッチ",
+                "故障",
+                "ノイズ",
+                "歪み",
+                "VHS"
+            ],
+
+            "残像": [
+                "残像",
+                "エコー",
+                "モーション",
+                "ブラー",
+                "スピード"
+            ],
+
+            "スピード感": [
+                "残像",
+                "モーション",
+                "ブラー",
+                "速度"
+            ],
+
+            "粒子": [
+                "粒子",
+                "パーティクル",
+                "火花",
+                "煙",
+                "雨",
+                "雪"
+            ],
+
+            "パーティクル": [
+                "粒子",
+                "パーティクル",
+                "火花",
+                "煙"
+            ],
+
+            "雨": [
+                "雨",
+                "水滴",
+                "パーティクル",
+                "水"
+            ],
+
+            "雪": [
+                "雪",
+                "氷",
+                "パーティクル",
+                "粒子"
+            ],
+
+            "炎": [
+                "炎",
+                "火",
+                "燃焼",
+                "煙",
+                "光"
+            ],
+
+            "火": [
+                "炎",
+                "火",
+                "燃焼",
+                "煙",
+                "光"
+            ],
+
+            "爆発": [
+                "爆発",
+                "炎",
+                "火",
+                "煙",
+                "衝撃",
+                "光"
+            ],
+
+            "ホラー": [
+                "ホラー",
+                "怖い",
+                "不気味",
+                "歪み",
+                "ノイズ",
+                "グリッチ",
+                "暗い"
+            ],
+
+            "怖い": [
+                "ホラー",
+                "不気味",
+                "歪み",
+                "ノイズ",
+                "グリッチ",
+                "暗い"
+            ],
+
+            "不気味": [
+                "ホラー",
+                "怖い",
+                "歪み",
+                "ノイズ",
+                "グリッチ"
+            ],
+
+            "文字": [
+                "文字",
+                "テキスト",
+                "タイトル",
+                "フォント"
+            ],
+
+            "テキスト": [
+                "文字",
+                "テキスト",
+                "タイトル"
+            ],
+
+            "切り抜き": [
+                "キーイング",
+                "マット",
+                "透明",
+                "アルファ",
+                "クロマキー"
+            ],
+
+            "背景を消す": [
+                "キーイング",
+                "マット",
+                "透明",
+                "クロマキー"
+            ],
+
+            "緑を消す": [
+                "キーイング",
+                "クロマキー",
+                "緑",
+                "透明"
+            ],
+
+            "消す": [
+                "透明",
+                "フェード",
+                "不透明度",
+                "マット"
+            ],
+
+            "消える": [
+                "透明",
+                "フェード",
+                "不透明度"
+            ],
+
+            "出現": [
+                "フェード",
+                "表示",
+                "透明",
+                "ワイプ"
+            ],
+
+            "映画っぽく": [
+                "映画",
+                "フィルム",
+                "グレイン",
+                "カラー",
+                "光",
+                "コントラスト"
+            ],
+
+            "映画風": [
+                "映画",
+                "フィルム",
+                "グレイン",
+                "カラー",
+                "光"
+            ],
+
+            "レトロ": [
+                "フィルム",
+                "VHS",
+                "ノイズ",
+                "グレイン",
+                "色",
+                "古い"
+            ],
+
+            "VHS": [
+                "VHS",
+                "グリッチ",
+                "ノイズ",
+                "テレビ",
+                "故障"
+            ],
+
+            "ネオン": [
+                "ネオン",
+                "発光",
+                "グロー",
+                "光",
+                "輝き"
+            ],
+
+            "水": [
+                "水",
+                "波",
+                "水滴",
+                "歪み",
+                "反射"
+            ],
+
+            "水面": [
+                "水",
+                "波",
+                "歪み",
+                "反射"
+            ],
+
+            "立体": [
+                "3D",
+                "立体",
+                "影",
+                "光",
+                "ガラス"
+            ],
+
+            "3D": [
+                "3D",
+                "立体",
+                "遠近",
+                "影",
+                "光"
+            ]
+
+        };
+
+
+        /* =========================
+           HTMLエスケープ
+        ========================= */
+
+        function escapeHTML(value) {
+
+            return String(value ?? "")
+                .replace(
+                    /[&<>"']/g,
+                    function(char) {
+
+                        return {
+
+                            "&": "&amp;",
+                            "<": "&lt;",
+                            ">": "&gt;",
+                            '"': "&quot;",
+                            "'": "&#39;"
+
+                        }[char];
+
+                    }
+                );
+
+        }
+
+
+        /* =========================
+           コード判定
+        ========================= */
+
+        function isCodeItem(effect) {
+
+            return Boolean(effect.code) ||
+                effect.type === "Expression" ||
+                effect.type === "Expression Controls";
+
+        }
+
+
+        /* =========================
+           種類判定
+        ========================= */
+
+        function matchesKind(effect) {
+
+            if (
+                currentKind === "all"
+            ) {
+
+                return true;
+
+            }
+
+
+            if (
+                currentKind === "code"
+            ) {
+
+                return isCodeItem(effect);
+
+            }
+
+
+            if (
+                currentKind === "effect"
+            ) {
+
+                return !isCodeItem(effect);
+
+            }
+
+
+            return true;
+
+        }
+
+
+        /* =========================
+           ジャンル判定
+        ========================= */
+
+        function matchesGenre(effect) {
+
+            if (
+                currentGenre === "all"
+            ) {
+
+                return true;
+
+            }
+
+
+            return Boolean(
+                effect.tags &&
+                effect.tags.includes(
+                    currentGenre
+                )
+            );
+
+        }
+
+
+        /* =========================
+           お気に入り保存
+        ========================= */
+
+        function saveFavorites() {
+
+            localStorage.setItem(
+                "aeFavorites",
+                JSON.stringify(
+                    favorites
+                )
+            );
+
+        }
+
+
+        /* =========================
+           結果カード表示
+        ========================= */
+
+        function renderEffectCards(
+            effectList
+        ) {
+
+            results.innerHTML = "";
+
+
+            if (
+                effectList.length === 0
+            ) {
+
+                results.innerHTML = `
+
+                    <div class="no-result">
+
+                        条件に一致する項目がありません。
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            effectList.forEach(
+                function(effect) {
+
+                    const name =
+                        escapeHTML(
+                            effect.name
+                        );
+
+
+                    const type =
+                        escapeHTML(
+                            effect.type || ""
+                        );
+
+
+                    const description =
+                        escapeHTML(
+                            effect.description || ""
+                        );
+
+
+                    const code =
+                        effect.code
+                            ? escapeHTML(
+                                effect.code
+                            )
+                            : "";
+
+
+                    const tags =
+                        effect.tags || [];
+
+
+                    let tagsHTML = "";
+
+
+                    tags.forEach(
+                        function(tag) {
+
+                            tagsHTML += `
+
+                                <span class="tag">
+
+                                    #${escapeHTML(tag)}
+
+                                </span>
+
+                            `;
+
+                        }
+                    );
+
+
+                    const favoriteText =
+                        favorites.includes(
+                            effect.name
+                        )
+
+                            ? "⭐ お気に入り解除"
+
+                            : "☆ お気に入り";
+
+
+                    const codeHTML =
+                        code
+
+                            ? `
+
+                                <pre class="result-code">
+
+${code}
+
+                                </pre>
+
+
+                                <button
+                                    type="button"
+                                    data-action="copy"
+                                    data-effect-name="${name}"
+                                >
+
+                                    📋 コードをコピー
+
+                                </button>
+
+                            `
+
+                            : "";
+
+
+                    results.innerHTML += `
+
+                        <div
+                            class="result-card"
+                            data-effect-name="${name}"
+                        >
+
+
+                            <button
+                                class="favorite-button"
+                                type="button"
+                                data-action="favorite"
+                                data-effect-name="${name}"
+                            >
+
+                                ${favoriteText}
+
+                            </button>
+
+
+                            <h2>
+
+                                ${name}
+
+                            </h2>
+
+
+                            <div class="result-type">
+
+                                ${type}
+
+                            </div>
+
+
+                            <p class="result-description">
+
+                                ${description}
+
+                            </p>
+
+
+                            ${codeHTML}
+
+
+                            <div class="tags">
+
+                                ${tagsHTML}
+
+                            </div>
+
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+        }
+
+
+        /* =========================
+           フィルター結果
+        ========================= */
+
+        function renderFilteredResults() {
+
+            const filteredEffects =
+                effects.filter(
+                    function(effect) {
+
+                        return (
+                            matchesKind(effect) &&
+                            matchesGenre(effect)
+                        );
+
+                    }
+                );
+
+
+            renderEffectCards(
+                filteredEffects
+            );
+
+        }
+
+
+        /* =========================
+           再表示
+        ========================= */
+
+        function refreshResults() {
+
+            if (
+                searchBox.value.trim() !== ""
+            ) {
+
+                search();
+
+                return;
+
+            }
+
+
+            if (
+                currentKind !== "all" ||
+                currentGenre !== "all"
+            ) {
+
+                renderFilteredResults();
+
+                return;
+
+            }
+
+
+            results.innerHTML = "";
+
+        }
+
+
+        /* =========================
+           お気に入り
+        ========================= */
+
+        function toggleFavorite(
+            effectName
+        ) {
+
+            const index =
+                favorites.indexOf(
+                    effectName
+                );
+
+
+            if (
+                index === -1
+            ) {
+
+                favorites.push(
+                    effectName
+                );
+
+            } else {
+
+                favorites.splice(
+                    index,
+                    1
+                );
+
+            }
+
+
+            saveFavorites();
+
+            displayFavorites();
+
+            refreshResults();
+
+        }
+
+
+        /* =========================
+           最近使った保存
+        ========================= */
+
+        function addRecentEffect(
+            effectName
+        ) {
+
+            recentEffects =
+                recentEffects.filter(
+                    function(name) {
+
+                        return (
+                            name !== effectName
+                        );
+
+                    }
+                );
+
+
+            recentEffects.unshift(
+                effectName
+            );
+
+
+            recentEffects =
+                recentEffects.slice(
+                    0,
+                    10
+                );
+
+
+            localStorage.setItem(
+                "aeRecentEffects",
+                JSON.stringify(
+                    recentEffects
+                )
+            );
+
+
+            displayRecentEffects();
+
+        }
+
+
+        /* =========================
+           詳細表示
+        ========================= */
+
+        function showDetail(
+            effectName
+        ) {
+
+            const effect =
+                effects.find(
+                    function(item) {
+
+                        return (
+                            item.name ===
+                            effectName
+                        );
+
+                    }
+                );
+
+
+            if (!effect) {
+
+                return;
+
+            }
+
+
+            addRecentEffect(
+                effect.name
+            );
+
+
+            document
+                .getElementById(
+                    "modalTitle"
+                )
+                .textContent =
+                effect.name;
+
+
+            document
+                .getElementById(
+                    "modalType"
+                )
+                .textContent =
+                effect.type || "";
+
+
+            document
+                .getElementById(
+                    "modalDescription"
+                )
+                .textContent =
+                effect.description || "";
+
+
+            document
+                .getElementById(
+                    "modalPurposes"
+                )
+                .textContent =
+                (
+                    effect.purposes || []
+                ).join(
+                    " ・ "
+                );
+
+
+            const codeArea =
+                document.getElementById(
+                    "codeArea"
+                );
+
+
+            const modalCode =
+                document.getElementById(
+                    "modalCode"
+                );
+
+
+            if (
+                effect.code
+            ) {
+
+                codeArea.style.display =
+                    "block";
+
+
+                modalCode.textContent =
+                    effect.code;
+
+            } else {
+
+                codeArea.style.display =
+                    "none";
+
+
+                modalCode.textContent =
+                    "";
+
+            }
+
+
+            document
+                .getElementById(
+                    "effectModal"
+                )
+                .classList
+                .add(
+                    "show"
+                );
+
+        }
+
+
+        /* =========================
+           最近使った表示
+        ========================= */
+
+        function displayRecentEffects() {
+
+            const recentList =
+                document.getElementById(
+                    "recentList"
+                );
+
+
+            if (!recentList) {
+
+                return;
+
+            }
+
+
+            if (
+                recentEffects.length === 0
+            ) {
+
+                recentList.innerHTML =
+                    "<p>まだありません</p>";
+
+                return;
+
+            }
+
+
+            recentList.innerHTML = "";
+
+
+            recentEffects.forEach(
+                function(effectName) {
+
+                    const effect =
+                        effects.find(
+                            function(item) {
+
+                                return (
+                                    item.name ===
+                                    effectName
+                                );
+
+                            }
+                        );
+
+
+                    if (!effect) {
+
+                        return;
+
+                    }
+
+
+                    recentList.innerHTML += `
+
+                        <div
+                            class="recent-item"
+                            data-recent-name="${escapeHTML(effect.name)}"
+                        >
+
+                            <strong>
+
+                                ${escapeHTML(effect.name)}
+
+                            </strong>
+
+
+                            <span>
+
+                                ${escapeHTML(effect.type || "")}
+
+                            </span>
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+        }
+
+
+        /* =========================
+           お気に入り一覧
+        ========================= */
+
+        function displayFavorites() {
+
+            const favoriteList =
+                document.getElementById(
+                    "favoriteList"
+                );
+
+
+            if (!favoriteList) {
+
+                return;
+
+            }
+
+
+            if (
+                favorites.length === 0
+            ) {
+
+                favoriteList.innerHTML =
+                    "<p>お気に入りはありません</p>";
+
+                return;
+
+            }
+
+
+            favoriteList.innerHTML = "";
+
+
+            favorites.forEach(
+                function(effectName) {
+
+                    const effect =
+                        effects.find(
+                            function(item) {
+
+                                return (
+                                    item.name ===
+                                    effectName
+                                );
+
+                            }
+                        );
+
+
+                    if (!effect) {
+
+                        return;
+
+                    }
+
+
+                    favoriteList.innerHTML += `
+
+                        <div
+                            class="favorite-item"
+                        >
+
+                            <strong>
+
+                                ${escapeHTML(
+                                    effect.name
+                                )}
+
+                            </strong>
+
+
+                            <p>
+
+                                ${escapeHTML(
+                                    effect.description || ""
+                                )}
+
+                            </p>
+
+
+                            <button
+                                type="button"
+                                data-favorite-action="detail"
+                                data-effect-name="${escapeHTML(
+                                    effect.name
+                                )}"
+                            >
+
+                                詳細を見る
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                data-favorite-action="remove"
+                                data-effect-name="${escapeHTML(
+                                    effect.name
+                                )}"
+                            >
+
+                                ⭐ 解除
+
+                            </button>
+
+
+                        </div>
+
+                    `;
+
+                }
+            );
+
+        }
+
+
+        /* =========================
+           検索
+        ========================= */
+
+        function search() {
+
+            const keyword =
+                searchBox.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (
+                keyword === ""
+            ) {
+
+                if (
+                    currentKind !== "all" ||
+                    currentGenre !== "all"
+                ) {
+
+                    renderFilteredResults();
+
+                } else {
+
+                    results.innerHTML = "";
+
+                }
+
+                return;
+
+            }
+
+
+            const searchWords = [
+
+                keyword,
+
+                ...(synonyms[keyword] || [])
+
+            ];
+
+
+            const found =
+                effects
+
+
+                    /* 種類＋ジャンル */
+
+                    .filter(
+                        function(effect) {
+
+                            return (
+                                matchesKind(effect) &&
+                                matchesGenre(effect)
+                            );
+
+                        }
+                    )
+
+
+                    /* 関連度 */
+
+                    .map(
+                        function(effect) {
+
+                            const name =
+                                String(
+                                    effect.name || ""
+                                )
+                                .toLowerCase();
+
+
+                            const description =
+                                String(
+                                    effect.description || ""
+                                )
+                                .toLowerCase();
+
+
+                            const tags =
+                                (
+                                    effect.tags || []
+                                )
+                                .join(" ")
+                                .toLowerCase();
+
+
+                            const purposes =
+                                (
+                                    effect.purposes || []
+                                )
+                                .join(" ")
+                                .toLowerCase();
+
+
+                            let score = 0;
+
+
+                            searchWords.forEach(
+                                function(word) {
+
+                                    if (
+                                        name.includes(
+                                            word
+                                        )
+                                    ) {
+
+                                        score += 5;
+
+                                    }
+
+
+                                    if (
+                                        description.includes(
+                                            word
+                                        )
+                                    ) {
+
+                                        score += 3;
+
+                                    }
+
+
+                                    if (
+                                        tags.includes(
+                                            word
+                                        )
+                                    ) {
+
+                                        score += 3;
+
+                                    }
+
+
+                                    if (
+                                        purposes.includes(
+                                            word
+                                        )
+                                    ) {
+
+                                        score += 2;
+
+                                    }
+
+                                }
+                            );
+
+
+                            return {
+
+                                effect: effect,
+
+                                score: score
+
+                            };
+
+                        }
+                    )
+
+
+                    .filter(
+                        function(item) {
+
+                            return (
+                                item.score > 0
+                            );
+
+                        }
+                    )
+
+
+                    .sort(
+                        function(a, b) {
+
+                            return (
+                                b.score -
+                                a.score
+                            );
+
+                        }
+                    )
+
+
+                    .map(
+                        function(item) {
+
+                            return item.effect;
+
+                        }
+                    );
+
+
+            if (
+                found.length === 0
+            ) {
+
+                results.innerHTML = `
+
+                    <div class="no-result">
+
+                        「${escapeHTML(keyword)}」に
+                        関連する項目がありません。
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            renderEffectCards(
+                found
+            );
+
+        }
+
+
+        /* =========================
+           コードコピー
+        ========================= */
+
+        async function copyEffectCode(
+            effectName
+        ) {
+
+            const effect =
+                effects.find(
+                    function(item) {
+
+                        return (
+                            item.name ===
+                            effectName
+                        );
+
+                    }
+                );
+
+
+            if (
+                !effect ||
+                !effect.code
+            ) {
+
+                alert(
+                    "コピーできるコードがありません"
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                if (
+                    navigator.clipboard &&
+                    navigator.clipboard.writeText
+                ) {
+
+                    await navigator
+                        .clipboard
+                        .writeText(
+                            effect.code
+                        );
+
+                } else {
+
+                    const textarea =
+                        document.createElement(
+                            "textarea"
+                        );
+
+
+                    textarea.value =
+                        effect.code;
+
+
+                    document.body.appendChild(
+                        textarea
+                    );
+
+
+                    textarea.select();
+
+
+                    document.execCommand(
+                        "copy"
+                    );
+
+
+                    textarea.remove();
+
+                }
+
+
+                alert(
+                    "コードをコピーしました！"
+                );
+
+
+            } catch (
+                error
+            ) {
+
+                alert(
+                    "コピーできませんでした"
+                );
+
+            }
+
+        }
+
+
+        /* =========================
+           ジャンルフィルター
+        ========================= */
+
+        document
+            .querySelectorAll(
+                ".filter-button"
+            )
+            .forEach(
+                function(button) {
+
+                    button.addEventListener(
+                        "click",
+                        function() {
+
+
+                            document
+                                .querySelectorAll(
+                                    ".filter-button"
+                                )
+                                .forEach(
+                                    function(btn) {
+
+                                        btn.classList
+                                            .remove(
+                                                "active"
+                                            );
+
+                                    }
+                                );
+
+
+                            this.classList.add(
+                                "active"
+                            );
+
+
+                            currentGenre =
+                                this.dataset.filter;
+
+
+                            refreshResults();
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =========================
+           種類フィルター
+        ========================= */
+
+        document
+            .querySelectorAll(
+                ".type-filter-button"
+            )
+            .forEach(
+                function(button) {
+
+                    button.addEventListener(
+                        "click",
+                        function() {
+
+
+                            document
+                                .querySelectorAll(
+                                    ".type-filter-button"
+                                )
+                                .forEach(
+                                    function(btn) {
+
+                                        btn.classList
+                                            .remove(
+                                                "active"
+                                            );
+
+                                    }
+                                );
+
+
+                            this.classList.add(
+                                "active"
+                            );
+
+
+                            currentKind =
+                                this.dataset.kind;
+
+
+                            refreshResults();
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =========================
+           検索ボタン
+        ========================= */
+
+        searchButton.addEventListener(
+            "click",
+            search
+        );
+
+
+        /* =========================
+           Enterキー
+        ========================= */
+
+        searchBox.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    search();
+
+                }
+
+            }
+        );
+
+
+        /* =========================
+           結果クリック
+        ========================= */
+
+        results.addEventListener(
+            "click",
+            function(event) {
+
+
+                const button =
+                    event.target.closest(
+                        "button"
+                    );
+
+
+                if (button) {
+
+                    const action =
+                        button.dataset.action;
+
+
+                    const effectName =
+                        button.dataset.effectName;
+
+
+                    if (
+                        action === "favorite"
+                    ) {
+
+                        toggleFavorite(
+                            effectName
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (
+                        action === "copy"
+                    ) {
+
+                        copyEffectCode(
+                            effectName
+                        );
+
+                        return;
+
+                    }
+
+
+                    return;
+
+                }
+
+
+                const card =
+                    event.target.closest(
+                        ".result-card"
+                    );
+
+
+                if (!card) {
+
+                    return;
+
+                }
+
+
+                showDetail(
+                    card.dataset.effectName
+                );
+
+            }
+        );
+
+
+        /* =========================
+           最近使ったクリック
+        ========================= */
+
+        document
+            .getElementById(
+                "recentList"
+            )
+            .addEventListener(
+                "click",
+                function(event) {
+
+                    const item =
+                        event.target.closest(
+                            ".recent-item"
+                        );
+
+
+                    if (!item) {
+
+                        return;
+
+                    }
+
+
+                    showDetail(
+                        item.dataset.recentName
+                    );
+
+                }
+            );
+
+
+        /* =========================
+           お気に入りボタン
+        ========================= */
+
+        favoriteButton.addEventListener(
+            "click",
+            function(event) {
+
+                event.stopPropagation();
+
+
+                favoritePanel
+                    .classList
+                    .toggle(
+                        "show"
+                    );
+
+
+                displayFavorites();
+
+            }
+        );
+
+
+        /* =========================
+           お気に入りパネル
+        ========================= */
+
+        favoritePanel.addEventListener(
+            "click",
+            function(event) {
+
+                const button =
+                    event.target.closest(
+                        "button"
+                    );
+
+
+                if (!button) {
+
+                    return;
+
+                }
+
+
+                const effectName =
+                    button.dataset.effectName;
+
+
+                if (
+                    button.dataset.favoriteAction ===
+                    "detail"
+                ) {
+
+                    showDetail(
+                        effectName
+                    );
+
+                }
+
+
+                if (
+                    button.dataset.favoriteAction ===
+                    "remove"
+                ) {
+
+                    toggleFavorite(
+                        effectName
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================
+           モーダルを閉じる
+        ========================= */
+
+        document
+            .getElementById(
+                "closeModal"
+            )
+            .addEventListener(
+                "click",
+                function(event) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    document
+                        .getElementById(
+                            "effectModal"
+                        )
+                        .classList
+                        .remove(
+                            "show"
+                        );
+
+                }
+            );
+
+
+        /* =========================
+           背景クリックで閉じる
+        ========================= */
+
+        document
+            .getElementById(
+                "effectModal"
+            )
+            .addEventListener(
+                "click",
+                function(event) {
+
+                    if (
+                        event.target === this
+                    ) {
+
+                        this.classList
+                            .remove(
+                                "show"
+                            );
+
+                    }
+
+                }
+            );
+
+
+        /* =========================
+           モーダルコードコピー
+        ========================= */
+
+        document
+            .getElementById(
+                "copyCode"
+            )
+            .addEventListener(
+                "click",
+                async function() {
+
+
+                    const code =
+                        document
+                            .getElementById(
+                                "modalCode"
+                            )
+                            .textContent;
+
+
+                    if (!code) {
+
+                        return;
+
+                    }
+
+
+                    try {
+
+                        if (
+                            navigator.clipboard &&
+                            navigator.clipboard.writeText
+                        ) {
+
+                            await navigator
+                                .clipboard
+                                .writeText(
+                                    code
+                                );
+
+                        } else {
+
+                            const textarea =
+                                document.createElement(
+                                    "textarea"
+                                );
+
+
+                            textarea.value =
+                                code;
+
+
+                            document.body
+                                .appendChild(
+                                    textarea
+                                );
+
+
+                            textarea.select();
+
+
+                            document.execCommand(
+                                "copy"
+                            );
+
+
+                            textarea.remove();
+
+                        }
+
+
+                        this.textContent =
+                            "COPIED!";
+
+
+                        setTimeout(
+                            function() {
+
+                                document
+                                    .getElementById(
+                                        "copyCode"
+                                    )
+                                    .textContent =
+                                    "COPY";
+
+                            },
+                            1500
+                        );
+
+
+                    } catch (
+                        error
+                    ) {
+
+                        alert(
+                            "コピーできませんでした"
+                        );
+
+                    }
+
+                }
+            );
+
+
+        /* =========================
+           AE TIME CALCULATOR
+        ========================= */
+
+        const timeFps =
+            document.getElementById(
+                "timeFps"
+            );
+
+
+        const timeFrames =
+            document.getElementById(
+                "timeFrames"
+            );
+
+
+        const timeSeconds =
+            document.getElementById(
+                "timeSeconds"
+            );
+
+
+        const timecodeInput =
+            document.getElementById(
+                "timecodeInput"
+            );
+
+
+        const timeCalculateButton =
+            document.getElementById(
+                "timeCalculateButton"
+            );
+
+
+        const timeClearButton =
+            document.getElementById(
+                "timeClearButton"
+            );
+
+
+        const resultFrames =
+            document.getElementById(
+                "resultFrames"
+            );
+
+
+        const resultSeconds =
+            document.getElementById(
+                "resultSeconds"
+            );
+
+
+        const resultTimecode =
+            document.getElementById(
+                "resultTimecode"
+            );
+
+
+        /* フレーム → タイムコード */
+
+        function framesToTimecode(
+            frames,
+            fps
+        ) {
+
+            frames =
+                Math.max(
+                    0,
+                    Math.round(
+                        frames
+                    )
+                );
+
+
+            const hours =
+                Math.floor(
+                    frames /
+                    (fps * 3600)
+                );
+
+
+            frames %=
+                fps * 3600;
+
+
+            const minutes =
+                Math.floor(
+                    frames /
+                    (fps * 60)
+                );
+
+
+            frames %=
+                fps * 60;
+
+
+            const seconds =
+                Math.floor(
+                    frames /
+                    fps
+                );
+
+
+            const remainingFrames =
+                frames % fps;
+
+
+            return [
+
+                String(hours)
+                    .padStart(
+                        2,
+                        "0"
+                    ),
+
+                String(minutes)
+                    .padStart(
+                        2,
+                        "0"
+                    ),
+
+                String(seconds)
+                    .padStart(
+                        2,
+                        "0"
+                    ),
+
+                String(remainingFrames)
+                    .padStart(
+                        2,
+                        "0"
+                    )
+
+            ].join(":");
+
+        }
+
+
+        /* タイムコード → フレーム */
+
+        function timecodeToFrames(
+            timecode,
+            fps
+        ) {
+
+            const parts =
+                timecode
+                    .trim()
+                    .split(":");
+
+
+            if (
+                parts.length !== 4
+            ) {
+
+                return null;
+
+            }
+
+
+            const hours =
+                Number(
+                    parts[0]
+                );
+
+
+            const minutes =
+                Number(
+                    parts[1]
+                );
+
+
+            const seconds =
+                Number(
+                    parts[2]
+                );
+
+
+            const frames =
+                Number(
+                    parts[3]
+                );
+
+
+            if (
+                !Number.isFinite(hours) ||
+                !Number.isFinite(minutes) ||
+                !Number.isFinite(seconds) ||
+                !Number.isFinite(frames)
+            ) {
+
+                return null;
+
+            }
+
+
+            return (
+                hours * fps * 3600 +
+                minutes * fps * 60 +
+                seconds * fps +
+                frames
+            );
+
+        }
+
+
+        /* 変換 */
+
+        timeCalculateButton.addEventListener(
+            "click",
+            function() {
+
+
+                const fps =
+                    Number(
+                        timeFps.value
+                    );
+
+
+                if (
+                    !Number.isFinite(fps) ||
+                    fps <= 0
+                ) {
+
+                    alert(
+                        "FPSを入力してください"
+                    );
+
+                    return;
+
+                }
+
+
+                let frames =
+                    null;
+
+
+                let seconds =
+                    null;
+
+
+                /* タイムコード */
+
+                if (
+                    timecodeInput
+                        .value
+                        .trim() !== ""
+                ) {
+
+                    frames =
+                        timecodeToFrames(
+                            timecodeInput.value,
+                            fps
+                        );
+
+
+                    if (
+                        frames === null
+                    ) {
+
+                        alert(
+                            "タイムコードは\n00:00:04:00\nの形式で入力してください"
+                        );
+
+                        return;
+
+                    }
+
+
+                    seconds =
+                        frames / fps;
+
+                }
+
+
+                /* フレーム */
+
+                else if (
+                    timeFrames
+                        .value
+                        .trim() !== ""
+                ) {
+
+                    frames =
+                        Number(
+                            timeFrames.value
+                        );
+
+
+                    if (
+                        !Number.isFinite(
+                            frames
+                        ) ||
+                        frames < 0
+                    ) {
+
+                        alert(
+                            "フレーム数を正しく入力してください"
+                        );
+
+                        return;
+
+                    }
+
+
+                    seconds =
+                        frames / fps;
+
+                }
+
+
+                /* 秒 */
+
+                else if (
+                    timeSeconds
+                        .value
+                        .trim() !== ""
+                ) {
+
+                    seconds =
+                        Number(
+                            timeSeconds.value
+                        );
+
+
+                    if (
+                        !Number.isFinite(
+                            seconds
+                        ) ||
+                        seconds < 0
+                    ) {
+
+                        alert(
+                            "秒数を正しく入力してください"
+                        );
+
+                        return;
+
+                    }
+
+
+                    frames =
+                        Math.round(
+                            seconds * fps
+                        );
+
+                }
+
+
+                else {
+
+                    alert(
+                        "フレーム・秒・タイムコードのどれかを入力してください"
+                    );
+
+                    return;
+
+                }
+
+
+                resultFrames.textContent =
+                    Math.round(
+                        frames
+                    ) +
+                    " frame";
+
+
+                resultSeconds.textContent =
+                    seconds.toFixed(
+                        3
+                    ) +
+                    " sec";
+
+
+                resultTimecode.textContent =
+                    framesToTimecode(
+                        frames,
+                        fps
+                    );
+
+
+                timeFrames.value =
+                    Math.round(
+                        frames
+                    );
+
+
+                timeSeconds.value =
+                    seconds.toFixed(
+                        3
+                    );
+
+
+                timecodeInput.value =
+                    framesToTimecode(
+                        frames,
+                        fps
+                    );
+
+            }
+        );
+
+
+        /* クリア */
+
+        timeClearButton.addEventListener(
+            "click",
+            function() {
+
+                timeFrames.value =
+                    "";
+
+
+                timeSeconds.value =
+                    "";
+
+
+                timecodeInput.value =
+                    "";
+
+
+                resultFrames.textContent =
+                    "---";
+
+
+                resultSeconds.textContent =
+                    "---";
+
+
+                resultTimecode.textContent =
+                    "---";
+
+            }
+        );
+
+
+        /* =========================
+           HOME
+        ========================= */
+
+        homeButton.addEventListener(
+            "click",
+            function() {
+
+
+                searchBox.value =
+                    "";
+
+
+                results.innerHTML =
+                    "";
+
+
+                /* 種類リセット */
+
+                currentKind =
+                    "all";
+
+
+                document
+                    .querySelectorAll(
+                        ".type-filter-button"
+                    )
+                    .forEach(
+                        function(button) {
+
+                            button.classList
+                                .remove(
+                                    "active"
+                                );
+
+                        }
+                    );
+
+
+                const allKindButton =
+                    document.querySelector(
+                        '.type-filter-button[data-kind="all"]'
+                    );
+
+
+                if (
+                    allKindButton
+                ) {
+
+                    allKindButton.classList
+                        .add(
+                            "active"
+                        );
+
+                }
+
+
+                /* ジャンルリセット */
+
+                currentGenre =
+                    "all";
+
+
+                document
+                    .querySelectorAll(
+                        ".filter-button"
+                    )
+                    .forEach(
+                        function(button) {
+
+                            button.classList
+                                .remove(
+                                    "active"
+                                );
+
+                        }
+                    );
+
+
+                const allGenreButton =
+                    document.querySelector(
+                        '.filter-button[data-filter="all"]'
+                    );
+
+
+                if (
+                    allGenreButton
+                ) {
+
+                    allGenreButton.classList
+                        .add(
+                            "active"
+                        );
+
+                }
+
+
+                favoritePanel
+                    .classList
+                    .remove(
+                        "show"
+                    );
+
+
+                displayRecentEffects();
+
+                displayFavorites();
+
+
+                window.scrollTo({
+
+                    top: 0,
+
+                    behavior: "smooth"
+
+                });
+
+            }
+        );
+
+
+        /* =========================
+           初期表示
+        ========================= */
+
+        displayRecentEffects();
+
+        displayFavorites();
+
+
+    </script>
+
+
+</body>
+
+</html>
